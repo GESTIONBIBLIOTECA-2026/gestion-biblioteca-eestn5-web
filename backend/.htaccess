@@ -1,0 +1,17 @@
+# Solo hace falta si el backend se sirve con Apache (XAMPP).
+# Con "php -S localhost:3001 -t ../frontend index.php" este archivo no se usa.
+
+RewriteEngine On
+
+# Nadie puede descargar el .env, el certificado ni las carpetas internas
+RewriteRule (^|/)\. - [F]
+RewriteRule ^(src|scripts)(/|$) - [F]
+RewriteRule \.pem$ - [F]
+
+# Apache esconde el header Authorization: se lo pasa a PHP
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Todas las peticiones a /api/... las atiende index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
