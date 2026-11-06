@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es" class="verificando-sesion" data-acceso="admin">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nuevo pedido - Biblioteca Invaluable</title>
+
+    <!-- Tema claro / oscuro (va primero para que no parpadee) -->
+    <script src="js/tema.js"></script>
+
+    <!-- Estilos generales y componentes compartidos -->
+    <link rel="stylesheet" href="css/estilo-general.css">
+    <link rel="stylesheet" href="css/componentes.css">
+
+    <!-- Estilos exclusivos del módulo de pedidos y préstamos -->
+    <link rel="stylesheet" href="css/prestamos.css">
+
+    <!-- Fuente Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- menu-compacto: el menú lateral muestra solo los íconos hasta pasar el mouse -->
+    <div class="layout-dashboard menu-compacto">
+
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
+
+            <a href="index.html" class="sidebar-logo" aria-label="Ir al inicio">
+
+                <div class="sidebar-logo-icono">
+                    <i data-lucide="book-open"></i>
+                </div>
+
+                <div class="sidebar-logo-texto">
+                    <h2>BIBLIOTECA</h2>
+                    <p>INVALUABLE</p>
+                </div>
+
+            </a>
+
+            <nav class="sidebar-nav" aria-label="Menú principal">
+
+                <a href="index.html" class="nav-item" title="Inicio">
+                    <i data-lucide="house"></i>
+                    <span>Inicio</span>
+                </a>
+
+                <a href="usuarios.html" class="nav-item" title="Usuarios">
+                    <i data-lucide="users"></i>
+                    <span>Usuarios</span>
+                </a>
+
+                <a href="prestamos.html" class="nav-item activo" aria-current="page" title="Préstamos">
+                    <i data-lucide="book-open-check"></i>
+                    <span>Préstamos</span>
+                </a>
+
+                <a href="libros.html" class="nav-item" title="Libros">
+                    <i data-lucide="book"></i>
+                    <span>Libros</span>
+                </a>
+
+                <a href="reportes.html" class="nav-item" title="Reportes">
+                    <i data-lucide="chart-no-axes-column"></i>
+                    <span>Reportes</span>
+                </a>
+
+                <a href="configuracion.html" class="nav-item" title="Configuración">
+                    <i data-lucide="settings"></i>
+                    <span>Configuración</span>
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="contenido-principal">
+
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="encabezado-superior">
+
+                <p class="titulo-encabezado">Panel de Administración</p>
+
+                <div class="encabezado-derecha">
+
+                    <div class="info-fecha-hora">
+
+                        <div class="item-fecha-hora">
+                            <i data-lucide="calendar"></i>
+                            <span data-fecha-hoy></span>
+                        </div>
+
+                        <div class="item-fecha-hora">
+                            <i data-lucide="clock"></i>
+                            <span id="reloj-actual">--:--</span>
+                        </div>
+
+                    </div>
+
+                    <!-- MENÚ DEL PERFIL -->
+                    <div class="menu-perfil" data-menu-perfil>
+
+                        <button
+                            type="button"
+                            class="usuario-perfil"
+                            data-abrir-menu-perfil
+                            aria-haspopup="menu"
+                            aria-expanded="false"
+                            aria-controls="menuPerfil"
+                        >
+                            <span class="avatar-usuario">
+                                <i data-lucide="user-round"></i>
+                            </span>
+
+                            <span class="nombre-perfil" data-nombre-admin>Admin</span>
+
+                            <i data-lucide="chevron-down" class="flecha-perfil"></i>
+                        </button>
+
+                        <div class="menu-perfil-lista" id="menuPerfil" role="menu" aria-label="Opciones del perfil" hidden>
+
+                            <div class="menu-perfil-cabecera">
+                                <strong data-nombre-admin>Admin</strong>
+                                <span data-rol-admin>Administrador</span>
+                            </div>
+
+                            <a href="configuracion.html" class="menu-perfil-opcion" role="menuitem">
+                                <i data-lucide="user-cog"></i>
+                                <span class="texto-opcion">Ajustes del perfil</span>
+                            </a>
+
+                            <button
+                                type="button"
+                                class="menu-perfil-opcion"
+                                role="menuitemcheckbox"
+                                aria-checked="false"
+                                aria-label="Apariencia: modo claro"
+                                data-cambiar-tema
+                            >
+                                <i data-lucide="palette"></i>
+                                <span class="texto-opcion">Apariencia</span>
+                                <span class="switch-tema" aria-hidden="true">
+                                    <i data-lucide="moon" class="switch-tema-fondo fondo-luna"></i>
+                                    <i data-lucide="sun" class="switch-tema-fondo fondo-sol"></i>
+                                    <span class="switch-tema-perilla">
+                                        <i data-lucide="moon" data-icono-tema="oscuro"></i>
+                                        <i data-lucide="sun" data-icono-tema="claro"></i>
+                                    </span>
+                                </span>
+                            </button>
+
+                            <hr class="menu-perfil-separador">
+
+                            <button type="button" class="menu-perfil-opcion peligro" role="menuitem" data-cerrar-sesion>
+                                <i data-lucide="log-out"></i>
+                                <span class="texto-opcion">Cerrar sesión</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <main class="contenedor pagina">
+
+                <!-- TÍTULO -->
+                <section class="encabezado-pagina">
+                    <div>
+                        <h1>Nuevo pedido</h1>
+                        <p>Buscá al usuario y el libro, indicá la cantidad y las fechas para registrar la reserva.</p>
+                    </div>
+
+                    <div class="acciones-encabezado">
+                        <a href="pedidos.html" class="boton-secundario">
+                            <i data-lucide="arrow-left"></i>
+                            Volver a pedidos
+                        </a>
+                    </div>
+                </section>
+
+                <!-- ALTA: POST /api/pedidos -->
+                <section class="panel panel-formulario" aria-labelledby="tituloAlta">
+                    <div class="panel-cabecera">
+                        <div class="panel-titulo">
+                            <div class="panel-icono"><i data-lucide="book-plus"></i></div>
+                            <div>
+                                <h2 id="tituloAlta">Datos del pedido</h2>
+                                <p>Los campos con * son obligatorios. El pedido queda pendiente hasta que se entregue.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="formularioPedido" class="formulario" novalidate>
+
+                        <div class="campos">
+
+                            <!-- USUARIO -->
+                            <div class="campo doble">
+                                <label for="buscarUsuario">Usuario *</label>
+                                <div class="buscador">
+                                    <input
+                                        type="text"
+                                        id="buscarUsuario"
+                                        placeholder="Escribí el nombre o el DNI del usuario..."
+                                        autocomplete="off"
+                                        aria-autocomplete="list"
+                                        aria-controls="resultadosUsuarios"
+                                    >
+                                    <input type="hidden" name="id_usuario" id="idUsuario">
+                                    <div id="resultadosUsuarios" class="resultados" role="listbox" aria-live="polite"></div>
+                                </div>
+                                <small class="pista" data-pista="id_usuario">Solo aparecen usuarios habilitados.</small>
+                            </div>
+
+                            <!-- FECHAS -->
+                            <div class="campo">
+                                <label for="fechaPedido">Fecha de pedido *</label>
+                                <input type="date" name="fecha_pedido" id="fechaPedido" required>
+                                <small class="pista" data-pista="fecha_pedido"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="fechaDevolucion">Fecha de devolución *</label>
+                                <input type="date" name="fecha_devolucion" id="fechaDevolucion" required>
+                                <small class="pista" data-pista="fecha_devolucion"></small>
+                            </div>
+
+                            <!-- LIBRO -->
+                            <div class="campo completo">
+                                <div class="panel-filtros-libro">
+                                    <div class="encabezado-filtros-libro">
+                                        <div class="titulo-filtros-libro">
+                                            <span class="icono-filtros" aria-hidden="true">
+                                                <i data-lucide="search"></i>
+                                            </span>
+                                            <div>
+                                                <h3>Buscar libro *</h3>
+                                                <p>Filtrá el catálogo por título, autor o editorial.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="acciones-filtros">
+                                            <span id="contadorLibros" class="contador-resultados" aria-live="polite">0 libros</span>
+                                            <button type="button" id="limpiarFiltros" class="boton-secundario boton-limpiar">
+                                                <i data-lucide="rotate-ccw"></i>
+                                                Limpiar filtros
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="filtros-libros">
+                                        <div class="campo-filtro-grupo">
+                                            <label for="buscarLibro">Título</label>
+                                            <input
+                                                type="text"
+                                                id="buscarLibro"
+                                                class="filtro"
+                                                placeholder="Ej.: El Principito"
+                                                autocomplete="off"
+                                            >
+                                        </div>
+                                        <div class="campo-filtro-grupo">
+                                            <label for="buscarAutor">Autor</label>
+                                            <input
+                                                type="text"
+                                                id="buscarAutor"
+                                                class="filtro"
+                                                placeholder="Ej.: George Orwell"
+                                                autocomplete="off"
+                                            >
+                                        </div>
+                                        <div class="campo-filtro-grupo">
+                                            <label for="buscarEditorial">Editorial</label>
+                                            <input
+                                                type="text"
+                                                id="buscarEditorial"
+                                                class="filtro"
+                                                placeholder="Ej.: Edimat"
+                                                autocomplete="off"
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <div class="buscador buscador-libro">
+                                        <label for="libroSeleccionado">Libro seleccionado *</label>
+                                        <input
+                                            type="text"
+                                            id="libroSeleccionado"
+                                            placeholder="Seleccioná un libro de los resultados..."
+                                            autocomplete="off"
+                                            readonly
+                                            aria-autocomplete="list"
+                                            aria-controls="resultadosLibros"
+                                        >
+                                        <input type="hidden" name="id_libro" id="idLibro">
+                                        <div id="resultadosLibros" class="resultados resultados-libros" role="listbox" aria-live="polite"></div>
+                                    </div>
+
+                                    <small class="pista" data-pista="id_libro"></small>
+                                </div>
+                            </div>
+
+                            <!-- STOCK Y CANTIDAD -->
+                            <div class="campo">
+                                <label for="stock">Stock disponible</label>
+                                <input type="text" id="stock" placeholder="Seleccioná un libro" readonly>
+                            </div>
+
+                            <div class="campo">
+                                <label for="cantidad">Cantidad *</label>
+                                <input type="number" name="cantidad" id="cantidad" min="1" value="1" required>
+                                <small class="pista" data-pista="cantidad"></small>
+                            </div>
+
+                        </div>
+
+                        <div class="acciones-formulario">
+                            <a href="pedidos.html" class="boton-secundario">Cancelar</a>
+                            <button type="submit" class="boton-principal" id="botonGuardar">
+                                <i data-lucide="save"></i>
+                                Guardar pedido
+                            </button>
+                        </div>
+
+                    </form>
+                </section>
+
+                <!-- AYUDA RÁPIDA -->
+                <section class="nota-modulo" aria-label="Ayuda sobre el alta de pedidos">
+                    <i data-lucide="info"></i>
+                    <p>
+                        La reserva descuenta los ejemplares del stock disponible. Si el pedido se rechaza,
+                        los ejemplares vuelven al estante automáticamente.
+                    </p>
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- AVISO FLOTANTE -->
+    <div id="avisoFlotante" class="aviso-flotante" role="status" aria-live="polite" hidden></div>
+
+    <!-- Sesión y lógica de la página -->
+    <script type="module" src="js/sesion.js"></script>
+    <script type="module" src="js/crear-pedido.js"></script>
+
+    <script>
+        window.lucide?.createIcons();
+    </script>
+
+</body>
+
+</html>

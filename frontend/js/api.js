@@ -71,3 +71,10 @@ export const obtenerMiPerfil = () => pedir("/perfil");
 export const guardarMiPerfil = (datos) => pedir("/perfil", "PUT", datos);
 export const cambiarMiClave = (datos) => pedir("/perfil/clave", "PUT", datos);
 export const obtenerMiCuenta = () => pedir("/perfil/historial");   // inicio del alumno / docente
+
+// --- Pedidos y préstamos (módulo del Grupo 4 integrado) ---
+export const obtenerResumenPedidos = () => pedir("/pedidos/resumen");
+export const listarPedidos = (filtros = {}) => pedir(`/pedidos?${new URLSearchParams(filtros)}`);
+export const obtenerFormularioPedido = () => pedir("/pedidos/formulario");
+export const registrarPedido = (datos) => pedir("/pedidos", "POST", datos);
+export const cambiarEstadoPedido = (id, estado) => pedir(`/pedidos/${id}/estado`, "PATCH", { estado });

@@ -16,6 +16,7 @@ import dashboardRoutes from "./src/routes/dashboard.routes.js";
 import usuariosRoutes from "./src/routes/usuarios.routes.js";
 import cursosRoutes from "./src/routes/cursos.routes.js";
 import prestamosRoutes from "./src/routes/prestamos.routes.js";
+import pedidosRoutes from "./src/routes/pedidos.routes.js";
 import librosRoutes from "./src/routes/libros.routes.js";
 
 // 2. Aplicación y middlewares globales
@@ -34,6 +35,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/cursos", cursosRoutes);
 app.use("/api/prestamos", prestamosRoutes);
+app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/libros", librosRoutes);
 
 // 4. Ruta de la API que no existe → 404

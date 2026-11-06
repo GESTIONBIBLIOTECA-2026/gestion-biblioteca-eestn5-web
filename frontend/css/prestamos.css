@@ -1,0 +1,379 @@
+/* =========================================================
+   MÓDULO DE PEDIDOS Y PRÉSTAMOS
+   Estilos propios de prestamos.html, pedidos.html,
+   historial.html y crear-pedido.html.
+   Usa las variables de estilo-general.css (tema claro / oscuro)
+   y las piezas compartidas de componentes.css.
+========================================================= */
+
+/* --- 1. Acciones del encabezado de página --- */
+
+.acciones-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.acciones-encabezado .boton-principal,
+.acciones-encabezado .boton-secundario {
+    white-space: nowrap;
+}
+
+
+/* --- 2. Accesos rápidos del inicio de Préstamos --- */
+
+.accesos-modulo {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.acceso-modulo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 12px;
+    background: var(--fondo-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
+    color: var(--texto-principal);
+    text-decoration: none;
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.acceso-modulo:hover {
+    border-color: var(--azul-400);
+    background: var(--fondo-tarjeta-hover);
+    transform: translateY(-1px);
+}
+
+.acceso-modulo-icono {
+    display: grid;
+    place-items: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    color: var(--azul-500);
+    background: var(--azul-suave);
+}
+
+.acceso-modulo-icono svg {
+    width: 20px;
+    height: 20px;
+}
+
+.acceso-modulo div:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+}
+
+.acceso-modulo strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.acceso-modulo span {
+    display: block;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.acceso-modulo > svg {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--texto-mutado);
+}
+
+
+/* --- 3. Nota informativa al pie de las páginas --- */
+
+.nota-modulo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 18px;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 10px;
+    background: var(--superficie-sutil);
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.nota-modulo > svg {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    color: var(--azul-500);
+}
+
+.nota-modulo strong {
+    color: var(--texto-principal);
+    font-weight: 600;
+}
+
+
+/* --- 4. Textos auxiliares de las tablas --- */
+
+.texto-tenue {
+    color: var(--texto-mutado);
+    font-size: 12px;
+}
+
+.tabla td .texto-error,
+.texto-error {
+    display: block;
+    margin-top: 3px;
+    color: var(--rojo-500);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* --- 5. Formulario de alta: el panel deja ver los desplegables --- */
+
+.panel-formulario {
+    overflow: visible;
+}
+
+
+/* --- 6. Buscador con resultados en vivo (usuario y libro) --- */
+
+.buscador {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.buscador > label {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.resultados {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 10px;
+    background: var(--fondo-sidebar);
+    box-shadow: var(--sombra-menu);
+}
+
+.resultados:empty {
+    display: none;
+}
+
+.resultados button {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    border: 0;
+    border-bottom: 1px solid var(--borde-tarjeta);
+    background: transparent;
+    color: var(--texto-principal);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.resultados button:last-child {
+    border-bottom: 0;
+}
+
+.resultados button:hover,
+.resultados button:focus-visible {
+    background: var(--superficie-hover);
+    outline: none;
+}
+
+.resultados button strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.detalle-libro {
+    margin-top: 3px;
+    color: var(--texto-secundario);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.sin-resultados {
+    margin: 0;
+    padding: 13px 14px;
+    color: var(--texto-mutado);
+    font-size: 12px;
+    font-style: italic;
+}
+
+
+/* --- 7. Panel de filtros del libro (alta de pedido) --- */
+
+.panel-filtros-libro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid var(--borde-tarjeta);
+    border-radius: 12px;
+    background: var(--fondo-hundido);
+}
+
+.encabezado-filtros-libro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.titulo-filtros-libro {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.icono-filtros {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    color: var(--azul-500);
+    background: var(--azul-suave);
+}
+
+.icono-filtros svg {
+    width: 18px;
+    height: 18px;
+}
+
+.titulo-filtros-libro h3 {
+    color: var(--texto-principal);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.titulo-filtros-libro p {
+    margin-top: 4px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.acciones-filtros {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.contador-resultados {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 6px;
+    background: var(--superficie-activa);
+    color: var(--texto-secundario);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.boton-limpiar {
+    min-height: 34px;
+    padding: 7px 11px;
+    font-size: 12px;
+}
+
+.filtros-libros {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.campo-filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.campo-filtro-grupo label {
+    color: var(--texto-secundario);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.buscador-libro {
+    padding-top: 4px;
+}
+
+.resultados-libros {
+    max-height: 280px;
+}
+
+
+/* --- 8. Responsive --- */
+
+@media (max-width: 1100px) {
+    .accesos-modulo {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .acciones-encabezado {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .acciones-encabezado .boton-principal,
+    .acciones-encabezado .boton-secundario {
+        flex: 1 1 auto;
+    }
+
+    .filtros-libros {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-filtros-libro {
+        padding: 14px;
+    }
+
+    .encabezado-filtros-libro,
+    .acciones-filtros {
+        align-items: stretch;
+    }
+
+    .acciones-filtros {
+        width: 100%;
+    }
+
+    .boton-limpiar {
+        flex: 1 1 auto;
+    }
+}

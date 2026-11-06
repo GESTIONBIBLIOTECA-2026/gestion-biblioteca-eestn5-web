@@ -22,11 +22,13 @@ localhost:3001                     backend/ (puerto 3001)                  src/d
 ```text
 .
 ├── package.json                  scripts npm y dependencias (Node.js)
-├── frontend/                     (no cambió: consume la API igual que antes)
+├── frontend/                     (consume la API del backend)
 │   ├── login.html, index.html, usuarios.html, libros.html, configuracion.html  (admin)
+│   ├── prestamos.html, pedidos.html, historial.html, crear-pedido.html         (préstamos)
 │   ├── catalogo.html, inicio-usuario.html                                       (alumnos y docentes)
-│   ├── css/
+│   ├── css/                      estilo-general.css, componentes.css, prestamos.css, ...
 │   └── js/                       config.js (URL de la API), api.js (fetch), ...
+│                                 prestamos.js, pedidos.js, historial.js, crear-pedido.js, pedidos-ui.js
 │
 └── backend/                      MVC: index.js ➔ Router ➔ Controller ➔ Model ➔ MySQL
     ├── index.js                  punto de entrada: CORS, JSON, frontend estático, rutas, 404 y errores
@@ -39,14 +41,14 @@ localhost:3001                     backend/ (puerto 3001)                  src/d
     │   │   ├── usuario.sql.js     pedazos de SQL compartidos (atraso, condición, columnas)
     │   │   ├── libro.models.js (catálogo), inventario.models.js (alta, cambios, stock, baja), ejemplar.models.js
     │   │   ├── errores.models.js  ErrorNegocio: el Modelo dice QUÉ pasó, el Controlador elige el código HTTP
-    │   │   └── dashboard.models.js, curso.models.js, prestamo.models.js
+    │   │   └── dashboard.models.js, curso.models.js, prestamo.models.js, pedido.models.js
     │   ├── controllers/          CONTROLLER: reglas de negocio y respuesta HTTP
-    │   │   ├── auth, perfil, usuarios, sanciones, dashboard, cursos, prestamos, libros
+    │   │   ├── auth, perfil, usuarios, sanciones, dashboard, cursos, prestamos, libros, pedidos
     │   │   └── respuestas.js      error500, responder409 y responderError (ErrorNegocio → 404 / 409)
     │   ├── routes/               ROUTER: URL + verbo HTTP → middlewares → controlador
-    │   │   └── auth, perfil, dashboard, usuarios, cursos, prestamos, libros
+    │   │   └── auth, perfil, dashboard, usuarios, cursos, prestamos, libros, pedidos
     │   └── middlewares/          auth (token), validaciones (URL), formularios (body), predicados,
-    │                             libros, límite de intentos
+    │                             libros, pedidos, límite de intentos
     └── scripts/                  schema.sql, datos-prueba-grupo5.sql, inicializar-bd.js,
                                   crear-admin-inicial.js, generar-hash.js, probar-conexion.js
 ```
@@ -63,7 +65,7 @@ GET /api/usuarios/5
   ➔ res.json({ payload: ... })
 ```
 
-Las URLs, los JSON de respuesta y los códigos HTTP se mantuvieron **exactamente iguales**, por eso el frontend no se tocó.
+Las URLs, los JSON de respuesta y los códigos HTTP del panel original se mantuvieron **exactamente iguales**, por eso las pantallas existentes siguen funcionando sin cambios.
 
 ### Endpoints
 
@@ -79,6 +81,12 @@ Las URLs, los JSON de respuesta y los códigos HTTP se mantuvieron **exactamente
 | `GET` | `/api/perfil/historial` | Mi cuenta (alumno/docente): datos, préstamos con `dias_restantes`, reservas y sanciones |
 | `GET` | `/api/dashboard` | `{ payload: { libros_total, prestamos_activos, alumnos_morosos } }` |
 | `GET` | `/api/prestamos?limite=5` | Últimos préstamos (en curso, atrasados y devueltos) |
+| **Grupo 4 (módulo de pedidos integrado)** | | |
+| `GET` | `/api/pedidos?estado=&texto=&limite=` | Listado de pedidos con filtros. `estado`: `pendiente`, `prestado`, `vencido`, `devuelto`, `cancelado` o `todos` |
+| `GET` | `/api/pedidos/resumen` | `{ total, pendientes, prestados, atrasados, devueltos, cancelados }` para el panel |
+| `GET` | `/api/pedidos/formulario` | Usuarios habilitados y libros con stock reservable (alta de pedido) |
+| `POST` | `/api/pedidos` | Alta de una reserva. Body `{ id_usuario, id_libro, cantidad, fecha_pedido, fecha_devolucion }` |
+| `PATCH` | `/api/pedidos/:id/estado` | Body `{ "estado": "prestado" \| "devuelto" \| "cancelado" }`: entregar, devolver o rechazar |
 | **Grupo 6 (integrado)** | | |
 | `GET` | `/api/libros?texto=&categoria=&disponibilidad=` | Catálogo con stock (cualquier rol). `disponibilidad`: `disponible` o `agotado` |
 | `GET` | `/api/libros/:id` | Un libro con autores, editorial, categoría y stock (cualquier rol) |
@@ -101,6 +109,23 @@ Las URLs, los JSON de respuesta y los códigos HTTP se mantuvieron **exactamente
 `filtro` puede ser `todos`, `alumnos`, `docentes`, `administradores`, `morosos`, `suspendidos` o `bajas`.
 Si un dato está mal, la API responde `400` con `{ error, campos: { dni: "..." } }` y la pantalla marca ese campo.
 Todas menos el login piden el header `Authorization: Bearer <token>`.
+
+### Módulo de préstamos (Grupo 4 integrado)
+
+Las páginas del módulo viven en el frontend y consumen `/api/pedidos` sobre las tablas reales
+(`pedidos`, `pedido_ejemplares`, `pedido_historial`, `ejemplares`, `usuarios`, `libros`):
+
+| Página | Qué hace |
+|---|---|
+| `prestamos.html` | Resumen de pedidos, préstamos en curso, atrasos y últimos movimientos |
+| `crear-pedido.html` | Alta de una reserva: buscador de usuarios y del catálogo, cantidad y fechas |
+| `pedidos.html` | Listado con filtros; botones para entregar, rechazar o registrar la devolución |
+| `historial.html` | Historial completo con fechas de pedido, entrega, devolución estimada y real |
+
+Flujo de estados: la reserva nace **pendiente**; “Entregar” la pasa a **prestado**
+(asigna ejemplares físicos); “Registrar devolución” la pasa a **devuelto** (los ejemplares vuelven
+al estante); “Rechazar” la deja **cancelado**. El estado **vencido** no se guarda: se calcula al
+listar cuando la fecha estimada ya pasó y el préstamo sigue en curso.
 
 ---
 

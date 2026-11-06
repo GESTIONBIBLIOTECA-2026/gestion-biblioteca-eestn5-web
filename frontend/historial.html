@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es" class="verificando-sesion" data-acceso="admin">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Historial de préstamos - Biblioteca Invaluable</title>
+
+    <!-- Tema claro / oscuro (va primero para que no parpadee) -->
+    <script src="js/tema.js"></script>
+
+    <!-- Estilos generales y componentes compartidos -->
+    <link rel="stylesheet" href="css/estilo-general.css">
+    <link rel="stylesheet" href="css/componentes.css">
+
+    <!-- Estilos exclusivos del módulo de pedidos y préstamos -->
+    <link rel="stylesheet" href="css/prestamos.css">
+
+    <!-- Fuente Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- menu-compacto: el menú lateral muestra solo los íconos hasta pasar el mouse -->
+    <div class="layout-dashboard menu-compacto">
+
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar">
+
+            <a href="index.html" class="sidebar-logo" aria-label="Ir al inicio">
+
+                <div class="sidebar-logo-icono">
+                    <i data-lucide="book-open"></i>
+                </div>
+
+                <div class="sidebar-logo-texto">
+                    <h2>BIBLIOTECA</h2>
+                    <p>INVALUABLE</p>
+                </div>
+
+            </a>
+
+            <nav class="sidebar-nav" aria-label="Menú principal">
+
+                <a href="index.html" class="nav-item" title="Inicio">
+                    <i data-lucide="house"></i>
+                    <span>Inicio</span>
+                </a>
+
+                <a href="usuarios.html" class="nav-item" title="Usuarios">
+                    <i data-lucide="users"></i>
+                    <span>Usuarios</span>
+                </a>
+
+                <a href="prestamos.html" class="nav-item activo" aria-current="page" title="Préstamos">
+                    <i data-lucide="book-open-check"></i>
+                    <span>Préstamos</span>
+                </a>
+
+                <a href="libros.html" class="nav-item" title="Libros">
+                    <i data-lucide="book"></i>
+                    <span>Libros</span>
+                </a>
+
+                <a href="reportes.html" class="nav-item" title="Reportes">
+                    <i data-lucide="chart-no-axes-column"></i>
+                    <span>Reportes</span>
+                </a>
+
+                <a href="configuracion.html" class="nav-item" title="Configuración">
+                    <i data-lucide="settings"></i>
+                    <span>Configuración</span>
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="contenido-principal">
+
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="encabezado-superior">
+
+                <p class="titulo-encabezado">Panel de Administración</p>
+
+                <div class="encabezado-derecha">
+
+                    <div class="info-fecha-hora">
+
+                        <div class="item-fecha-hora">
+                            <i data-lucide="calendar"></i>
+                            <span data-fecha-hoy></span>
+                        </div>
+
+                        <div class="item-fecha-hora">
+                            <i data-lucide="clock"></i>
+                            <span id="reloj-actual">--:--</span>
+                        </div>
+
+                    </div>
+
+                    <!-- MENÚ DEL PERFIL -->
+                    <div class="menu-perfil" data-menu-perfil>
+
+                        <button
+                            type="button"
+                            class="usuario-perfil"
+                            data-abrir-menu-perfil
+                            aria-haspopup="menu"
+                            aria-expanded="false"
+                            aria-controls="menuPerfil"
+                        >
+                            <span class="avatar-usuario">
+                                <i data-lucide="user-round"></i>
+                            </span>
+
+                            <span class="nombre-perfil" data-nombre-admin>Admin</span>
+
+                            <i data-lucide="chevron-down" class="flecha-perfil"></i>
+                        </button>
+
+                        <div class="menu-perfil-lista" id="menuPerfil" role="menu" aria-label="Opciones del perfil" hidden>
+
+                            <div class="menu-perfil-cabecera">
+                                <strong data-nombre-admin>Admin</strong>
+                                <span data-rol-admin>Administrador</span>
+                            </div>
+
+                            <a href="configuracion.html" class="menu-perfil-opcion" role="menuitem">
+                                <i data-lucide="user-cog"></i>
+                                <span class="texto-opcion">Ajustes del perfil</span>
+                            </a>
+
+                            <button
+                                type="button"
+                                class="menu-perfil-opcion"
+                                role="menuitemcheckbox"
+                                aria-checked="false"
+                                aria-label="Apariencia: modo claro"
+                                data-cambiar-tema
+                            >
+                                <i data-lucide="palette"></i>
+                                <span class="texto-opcion">Apariencia</span>
+                                <span class="switch-tema" aria-hidden="true">
+                                    <i data-lucide="moon" class="switch-tema-fondo fondo-luna"></i>
+                                    <i data-lucide="sun" class="switch-tema-fondo fondo-sol"></i>
+                                    <span class="switch-tema-perilla">
+                                        <i data-lucide="moon" data-icono-tema="oscuro"></i>
+                                        <i data-lucide="sun" data-icono-tema="claro"></i>
+                                    </span>
+                                </span>
+                            </button>
+
+                            <hr class="menu-perfil-separador">
+
+                            <button type="button" class="menu-perfil-opcion peligro" role="menuitem" data-cerrar-sesion>
+                                <i data-lucide="log-out"></i>
+                                <span class="texto-opcion">Cerrar sesión</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <main class="contenedor pagina">
+
+                <!-- TÍTULO Y ACCIONES -->
+                <section class="encabezado-pagina">
+                    <div>
+                        <h1>Historial de préstamos</h1>
+                        <p>Todas las reservas registradas, con las fechas reales de entrega y devolución.</p>
+                    </div>
+
+                    <div class="acciones-encabezado">
+                        <a href="pedidos.html" class="boton-secundario">
+                            <i data-lucide="list-checks"></i>
+                            Volver a pedidos
+                        </a>
+                        <a href="crear-pedido.html" class="boton-principal">
+                            <i data-lucide="book-plus"></i>
+                            Nuevo pedido
+                        </a>
+                    </div>
+                </section>
+
+                <!-- HISTORIAL COMPLETO: GET /api/pedidos?limite=500 -->
+                <section class="panel" aria-labelledby="tituloHistorial">
+                    <div class="panel-cabecera">
+                        <div class="panel-titulo">
+                            <div class="panel-icono"><i data-lucide="history"></i></div>
+                            <div>
+                                <h2 id="tituloHistorial">
+                                    Historial completo
+                                    <span class="contador-panel" id="totalHistorial">0</span>
+                                </h2>
+                                <p>Incluye pedidos pendientes, en curso, vencidos, devueltos y cancelados.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="filtrosHistorial" class="barra-filtros">
+                        <input
+                            type="search"
+                            name="texto"
+                            class="filtro ancho"
+                            placeholder="Buscar por usuario, DNI, libro o autor..."
+                            aria-label="Buscar en el historial por usuario, DNI, libro o autor"
+                        >
+                        <select name="estado" class="filtro" aria-label="Filtrar el historial por estado">
+                            <option value="todos">Todos los estados</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="prestado">En curso</option>
+                            <option value="vencido">Vencidos</option>
+                            <option value="devuelto">Devueltos</option>
+                            <option value="cancelado">Cancelados</option>
+                        </select>
+                        <button type="submit" class="boton-principal"><i data-lucide="search"></i> Buscar</button>
+                        <button type="reset" class="boton-secundario"><i data-lucide="rotate-ccw"></i> Limpiar</button>
+                    </form>
+
+                    <div class="tabla-contenedor">
+                        <table class="tabla">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Usuario</th>
+                                    <th scope="col">Libro</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Pedido</th>
+                                    <th scope="col">Entrega</th>
+                                    <th scope="col">Devolución</th>
+                                    <th scope="col">Devuelto</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoHistorial">
+                                <tr>
+                                    <td colspan="9" class="celda-mensaje">Cargando historial...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- AYUDA RÁPIDA -->
+                <section class="nota-modulo" aria-label="Ayuda sobre el historial">
+                    <i data-lucide="info"></i>
+                    <p>
+                        La columna <strong>Devolución</strong> muestra la fecha estimada pactada al hacer el pedido;
+                        <strong>Devuelto</strong> guarda la fecha real en la que volvió el ejemplar.
+                    </p>
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- AVISO FLOTANTE -->
+    <div id="avisoFlotante" class="aviso-flotante" role="status" aria-live="polite" hidden></div>
+
+    <!-- Sesión y lógica de la página -->
+    <script type="module" src="js/sesion.js"></script>
+    <script type="module" src="js/historial.js"></script>
+
+    <script>
+        window.lucide?.createIcons();
+    </script>
+
+</body>
+
+</html>
