@@ -1,18 +1,19 @@
 # 📚 Biblioteca Invaluable · Panel de Administración (Grupo 5)
 
-Panel del bibliotecario (plataforma **web**) con arquitectura **MVC**:
+Panel del bibliotecario (plataforma **web**) con arquitectura **MVC** en **Node.js**:
 
-- **Frontend:** HTML + CSS (carpeta `css/`) + JS con ES Modules (`fetch()` a la API).
-- **Backend:** **PHP** con la misma estructura MVC de la clase 06 (`routes ➔ controllers ➔ models`).
-- **Base de datos:** MySQL en Aiven, conectada desde PHP con **PDO** (sentencias preparadas con `?` + SSL).
+- **Frontend:** HTML + CSS (carpeta `css/`) + JavaScript con ES Modules (`fetch()` a la API).
+- **Backend:** **Node.js + Express 5** (`backend/`), con la estructura `routes ➔ controllers ➔ models`.
+- **Base de datos:** MySQL en **Aiven**, conectada con **mysql2** (pool de conexiones, sentencias preparadas con `?` y SSL).
+- **Sesión:** JWT (`jsonwebtoken`) y contraseñas con **bcrypt** (`bcryptjs`).
 
 ```text
-[ Frontend ]  fetch()  ─►  [ PHP: Router ➔ Controller ➔ Model ]  ─►  PDO  ─►  [ MySQL Aiven ]
- localhost:3001 / Live Server       backend/ (puerto 3001)          src/database/db.php
+[ Frontend ]  fetch()  ─►  [ Node.js: Router ➔ Controller ➔ Model ]  ─►  mysql2  ─►  [ MySQL Aiven ]
+localhost:3001                     backend/ (puerto 3001)                  src/database/db.js
 ```
 
-> La app móvil (PWA) sigue en Node.js y usa **la misma base**. Los dos backends son compatibles:
-> las contraseñas (bcrypt) y los tokens de sesión (JWT) sirven en ambos si comparten `JWT_SECRET`.
+> La app móvil (PWA) usa **la misma base**. Los dos backends son compatibles:
+> las contraseñas (bcrypt) y los tokens (JWT) sirven en ambos si comparten `JWT_SECRET`.
 
 ---
 
@@ -20,48 +21,49 @@ Panel del bibliotecario (plataforma **web**) con arquitectura **MVC**:
 
 ```text
 .
-├── frontend/                     (sin cambios: consume la API igual que antes)
+├── package.json                  scripts npm y dependencias (Node.js)
+├── frontend/                     (no cambió: consume la API igual que antes)
 │   ├── login.html, index.html, usuarios.html, libros.html, configuracion.html  (admin)
 │   ├── catalogo.html, inicio-usuario.html                                       (alumnos y docentes)
 │   ├── css/
 │   └── js/                       config.js (URL de la API), api.js (fetch), ...
 │
-└── backend/                      MVC: index.php ➔ Router ➔ Controller ➔ Model ➔ MySQL
-    ├── index.php                 punto de entrada: CORS, cuerpo JSON, monta las rutas, 404 y errores
+└── backend/                      MVC: index.js ➔ Router ➔ Controller ➔ Model ➔ MySQL
+    ├── index.js                  punto de entrada: CORS, JSON, frontend estático, rutas, 404 y errores
     ├── .env.example              plantilla (el .env real NO se sube)
-    ├── .htaccess                 solo si se usa Apache/XAMPP (protege .env, src/ y scripts/)
     ├── src/
-    │   ├── config/               env.php (.env con fail-fast), constants.php (reglas del negocio), config.php
-    │   ├── database/db.php       PDO → MySQL Aiven (SSL) + consultar(), ejecutar() y conTransaccion()
+    │   ├── config/               env.js (.env con fail-fast), constants.js (reglas del negocio), config.js
+    │   ├── database/db.js        pool mysql2 → MySQL Aiven (SSL) + conTransaccion()
     │   ├── models/               MODEL: solo SQL con comodines "?", devuelve datos
-    │   │   ├── usuario.models.php, busqueda.models.php, sancion.models.php, perfil.models.php
-    │   │   ├── usuario.sql.php    pedazos de SQL compartidos (atraso, condición, columnas)
-    │   │   ├── libro.models.php (catálogo), inventario.models.php (alta, cambios, stock, baja), ejemplar.models.php
-    │   │   ├── errores.models.php ErrorNegocio: el Modelo dice QUÉ pasó, el Controlador elige el código HTTP
-    │   │   └── dashboard.models.php, curso.models.php, prestamo.models.php
+    │   │   ├── usuario.models.js, busqueda.models.js, sancion.models.js, perfil.models.js
+    │   │   ├── usuario.sql.js     pedazos de SQL compartidos (atraso, condición, columnas)
+    │   │   ├── libro.models.js (catálogo), inventario.models.js (alta, cambios, stock, baja), ejemplar.models.js
+    │   │   ├── errores.models.js  ErrorNegocio: el Modelo dice QUÉ pasó, el Controlador elige el código HTTP
+    │   │   └── dashboard.models.js, curso.models.js, prestamo.models.js
     │   ├── controllers/          CONTROLLER: reglas de negocio y respuesta HTTP
     │   │   ├── auth, perfil, usuarios, sanciones, dashboard, cursos, prestamos, libros
-    │   │   └── respuestas.php    error500, responder409 y responderError (ErrorNegocio → 404 / 409)
+    │   │   └── respuestas.js      error500, responder409 y responderError (ErrorNegocio → 404 / 409)
     │   ├── routes/               ROUTER: URL + verbo HTTP → middlewares → controlador
-    │   │   └── Router.php        el "mini Express": get/post/put/patch/delete, usar() y montar()
-    │   └── middlewares/          auth (token), jwt, validaciones (URL), formularios (body), predicados, libros, límite de intentos
-    └── scripts/                  schema.sql, datos-prueba-grupo5.sql, inicializar-bd.php, crear-admin-inicial.php,
-                                  generar-hash.php, probar-conexion.php
+    │   │   └── auth, perfil, dashboard, usuarios, cursos, prestamos, libros
+    │   └── middlewares/          auth (token), validaciones (URL), formularios (body), predicados,
+    │                             libros, límite de intentos
+    └── scripts/                  schema.sql, datos-prueba-grupo5.sql, inicializar-bd.js,
+                                  crear-admin-inicial.js, generar-hash.js, probar-conexion.js
 ```
 
-### ¿Qué cambió respecto de Express?
+### ¿Cómo circula una petición?
 
-| Express (Node) | PHP |
-|---|---|
-| `index.js` + `app.listen(3001)` | `index.php` + `php -S localhost:3001 -t ../frontend index.php` |
-| `express.Router()`, `router.get("/:id", mw, ctrl)` | `new Router()`, `$router->get('/:id', mw(...), ctrl(...))` |
-| `req`, `res.status(404).json({...})` | `$req`, `responder(404, [...])` |
-| `next()` | si el middleware no llama a `responder()`, sigue el próximo paso |
-| `mysql2` + pool, `connection.query(sql, [valores])` | `PDO`, `consultar(sql, [valores])` / `ejecutar(sql, [valores])` |
-| `dotenv` | `src/config/env.php` lee el mismo `.env` |
-| `bcryptjs`, `jsonwebtoken` | `password_hash()` / `password_verify()` y `src/middlewares/jwt.php` |
+```text
+GET /api/usuarios/5
+  ➔ routes/usuarios.routes.js   (verificarAdmin + validarID)
+  ➔ controllers/usuarios.controllers.js
+  ➔ models/usuario.models.js    (SELECT ... WHERE u.id = ?)
+  ➔ database/db.js              (pool mysql2)
+  ➔ MySQL Aiven
+  ➔ res.json({ payload: ... })
+```
 
-Las URLs, los JSON de respuesta y los códigos HTTP son **exactamente los mismos**, por eso el frontend no se tocó.
+Las URLs, los JSON de respuesta y los códigos HTTP se mantuvieron **exactamente iguales**, por eso el frontend no se tocó.
 
 ### Endpoints
 
@@ -105,51 +107,111 @@ Todas menos el login piden el header `Authorization: Bearer <token>`.
 ## 🚀 Cómo levantarlo
 
 ### 1. Requisitos
-**PHP 8.1 o más nuevo** con las extensiones `pdo_mysql`, `openssl` y `mbstring` (XAMPP ya las trae).
-Para comprobarlo: `php -v` y `php -m`. En Windows con XAMPP, si `php` no se reconoce, usá `C:\xampp\php\php.exe`
-en lugar de `php` (o agregá `C:\xampp\php` al PATH). No hace falta `npm install`.
 
-### 2. Crear `backend/.env`
-```
-cd backend
-copy .env.example .env
-```
-Completá los datos de Aiven, guardá el `ca.pem` de Aiven dentro de `backend/` e inventá un texto largo para `JWT_SECRET`
-(si la app móvil en Node usa el mismo, los tokens sirven en las dos).
-Si falta alguna variable obligatoria, la API responde con el nombre de la que falta (fail-fast).
+- **Node.js 18 o más nuevo** (recomendado 20/22 LTS). Verificá con:
+  ```
+  node -v
+  npm -v
+  ```
+- No hace falta instalar ningún servidor web adicional (Apache, IIS, etc.): todo corre con Node.
 
-### 3. Probar la conexión y preparar la base (solo la primera vez)
+> En Windows, si PowerShell no reconoce `npm`, usá **`npm.cmd`** (por ejemplo `npm.cmd install`).
+> Si `node` tampoco se reconoce, instalá Node desde <https://nodejs.org> y volvé a abrir la terminal.
+
+### 2. Instalar dependencias (una sola vez)
+
+Desde la **raíz del proyecto** (`gestion-biblioteca-eestn5-web`):
+
 ```
-php scripts/probar-conexion.php        →  ✅ MySQL 8.0.x conectado a la base "defaultdb" (SSL: ...)
-php scripts/inicializar-bd.php         →  crea tablas, vistas, roles y categorías (no borra nada)
-php scripts/crear-admin-inicial.php    →  pide los datos del primer administrador (la clave no se ve)
+npm.cmd install
 ```
 
-### 4. Encender el servidor (desde `backend/`)
-```
-php -S localhost:3001 -t ../frontend index.php
-```
-Abrí **http://localhost:3001**. También funciona con **Live Server** abriendo `frontend/login.html`
-(la API sigue en `http://localhost:3001/api`, como dice `frontend/js/config.js`).
+Esto descarga Express, mysql2, bcryptjs, jsonwebtoken, cors, dotenv y nodemon en `node_modules/`.
 
-> **Con Apache/XAMPP (opcional):** si ponés el proyecto en `htdocs`, la API queda en
-> `http://localhost/<carpeta>/backend/api` y hay que cambiar `API_URL` en `frontend/js/config.js`.
-> El `.htaccess` ya bloquea el acceso al `.env`, al certificado y a las carpetas internas.
+### 3. Crear `backend/.env`
+
+```
+copy backend\.env.example backend\.env
+```
+
+Completá los datos de Aiven en `backend/.env`:
+
+| Variable | Qué va |
+|---|---|
+| `PORT` | `3001` (el panel se abre en ese puerto) |
+| `JWT_SECRET` | Un texto largo y secreto. Si la app móvil usa el mismo, los tokens sirven en las dos |
+| `DB_HOST` | Host de Aiven (`...aivencloud.com`) |
+| `DB_PORT` | Puerto de Aiven (por ejemplo `27892`) |
+| `DB_USER` | Usuario (`avnadmin`) |
+| `DB_PASSWORD` | Contraseña de Aiven |
+| `DB_NAME` | Nombre de la base (`defaultdb`) |
+| `DB_SSL` | `true` (Aiven exige SSL) |
+| `DB_CA_PATH` | `ca.pem` (el certificado tiene que estar en `backend/`) |
+| `DB_ZONA_HORARIA` | Opcional, por defecto `-03:00` |
+
+Si falta alguna variable obligatoria, el servidor **no arranca** y te dice cuál falta.
+
+### 4. Probar la conexión y preparar la base
+
+La base ya existe, pero estos comandos sirven para verificar y completar lo que falte:
+
+```
+npm.cmd run db:test     →  [OK] MySQL 8.0.x conectado a la base "defaultdb" (SSL: ...)
+npm.cmd run db:init     →  crea tablas, vistas, roles y categorías (no borra datos)
+npm.cmd run db:admin    →  crea el PRIMER administrador (solo si todavía no hay uno)
+```
+
+`db:init` es idempotente: se puede correr más de una vez sin perder información.
+
+### 5. Encender el servidor
+
+Desde la **raíz del proyecto**:
+
+```
+npm.cmd run dev
+```
+
+Vas a ver:
+
+```
+[OK] Servidor activo en http://localhost:3001
+[OK] Base de datos conectada
+```
+
+Abrí **<http://localhost:3001>** y entrá con el DNI y la contraseña del administrador.
+
+> `npm run dev` usa **nodemon**: si cambiás un archivo del backend, el servidor se reinicia solo.
+> Para correrlo sin reinicio automático: `npm.cmd start`.
 
 **Datos de prueba (opcional):** `backend/scripts/datos-prueba-grupo5.sql` carga usuarios de ejemplo
-(DNI 99010001 a 99010034, clave `prueba123`). Se ejecuta desde Database Client de VS Code.
+(DNI 99010001 a 99010034, clave `prueba123`). Se ejecuta desde Database Client de VS Code o HeidiSQL.
+
+---
+
+## 🧰 Scripts de npm
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Levanta el servidor con nodemon en el puerto 3001 |
+| `npm start` | Levanta el servidor sin reinicio automático |
+| `npm run db:test` | Prueba la conexión a MySQL y muestra la versión y el SSL |
+| `npm run db:init` | Crea tablas, vistas, roles y categorías (idempotente) |
+| `npm run db:admin` | Crea el primer administrador de forma interactiva |
+| `npm run hash -- clave123` | Genera un hash bcrypt para insertar usuarios a mano |
 
 ---
 
 ## 🕒 Zona horaria
 
-Cada conexión arranca con `SET time_zone = '-03:00'`, así `NOW()` y `CURRENT_DATE` dan la hora de Argentina.
+Cada conexión nueva del pool ejecuta `SET time_zone = '-03:00'`, así `NOW()` y `CURRENT_DATE` dan la hora de Argentina.
 Se cambia con `DB_ZONA_HORARIA` en `backend/.env`.
 
-## 👤 Crear otro administrador
+## 👤 Crear otro administrador a mano
+
 ```
-php scripts/generar-hash.php claveNueva123
+npm.cmd run hash -- claveNueva123
 ```
+
 ```sql
 INSERT INTO usuarios (dni, nombre_completo, curso_id, correo, telefono, direccion, password_hash, rol_id)
 VALUES ('12345678', 'Nombre Apellido', NULL, 'mail@eest5.edu.ar', '11 0000-0000', 'Dirección', '<hash>', 3);
@@ -161,10 +223,13 @@ VALUES ('12345678', 'Nombre Apellido', NULL, 'mail@eest5.edu.ar', '11 0000-0000'
 
 | Mensaje | Solución |
 |---|---|
-| `'php' no se reconoce como un comando` | Usá `C:\xampp\php\php.exe` o agregá `C:\xampp\php` al PATH. |
-| `could not find driver` | Falta `pdo_mysql`: en `php.ini` sacale el `;` a `extension=pdo_mysql` (y a `openssl`, `mbstring`). |
+| `'node' no se reconoce como un comando` | Instalá Node.js desde <https://nodejs.org> y abrí una terminal nueva. |
+| `'npm' no se reconoce como un comando` | En Windows usá `npm.cmd`, o agregá la carpeta de Node al PATH. |
+| `npm.ps1 cannot be loaded` / error de ExecutionPolicy | Usá `npm.cmd` o ejecutá `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. |
+| `Cannot find package 'express'` | Falta `npm install` en la raíz del proyecto. |
+| `Faltan variables en backend/.env` | Copiá `backend/.env.example` a `backend/.env` y completá la variable que nombra el mensaje. |
 | `Access denied for user` | Revisá `DB_USER` / `DB_PASSWORD` en `backend/.env` (y que `DB_SSL` no esté en `false`: Aiven exige SSL). |
 | `Connection timed out` / `getaddrinfo failed` | Revisá `DB_HOST` / `DB_PORT` y que el servicio de Aiven esté en **Running**. |
 | Error de certificado / SSL | Revisá que `ca.pem` sea el de Aiven y esté en `backend/` (`DB_CA_PATH=ca.pem`). |
-| `Faltan variables en backend/.env` | Completá la variable que nombra el mensaje. |
-| En la página: "No hay conexión con el servidor" | Falta la terminal con `php -S localhost:3001 -t ../frontend index.php`. |
+| `EADDRINUSE: address already in use :::3001` | Ya hay otro proceso en el puerto 3001: cerralo o cambiá `PORT` en `backend/.env`. |
+| En la página: "No hay conexión con el servidor" | Falta la terminal con `npm run dev` (la API tiene que estar en `http://localhost:3001`). |

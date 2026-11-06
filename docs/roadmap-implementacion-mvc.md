@@ -204,7 +204,7 @@ Antes de tocar el código, cada grupo debe poder completar este cuadro en una ho
 ### 🟠 GRUPO 4 — Gestión de Pedidos y Préstamos
 
 #### 🗑️ Qué deben purgar URGENTE:
-* **Eliminar todos los archivos PHP:** Borrar de la raíz de su rama `cambiar_estado.php`, `conexion.php`, `crear_pedido.php`, `guardar_pedido.php`, `historial.php`, `index.php`, `pedidos.php` y `base_datos.sql`. Ese código no corre en Node.js.
+* **Descartar cualquier backend viejo:** el proyecto está unificado en **Node.js + Express**. Si en alguna rama vieja quedan archivos sueltos de conexión, pedidos o historial que no sigan la arquitectura MVC actual, eliminarlos y trabajar sobre `backend/`.
 
 #### 🔧 Archivos Existentes a Mejorar:
 1. `backend/src/models/prestamo.models.js`:

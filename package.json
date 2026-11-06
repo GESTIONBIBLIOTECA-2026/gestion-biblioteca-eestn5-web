@@ -1,0 +1,30 @@
+{
+  "name": "gestion-biblioteca-eestn5-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Panel de administración de la biblioteca EEST N°5 - Node.js + Express + MySQL (Aiven)",
+  "type": "module",
+  "main": "backend/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon --watch backend backend/index.js",
+    "start": "node backend/index.js",
+    "db:test": "node backend/scripts/probar-conexion.js",
+    "db:init": "node backend/scripts/inicializar-bd.js",
+    "db:admin": "node backend/scripts/crear-admin-inicial.js",
+    "hash": "node backend/scripts/generar-hash.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.24.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

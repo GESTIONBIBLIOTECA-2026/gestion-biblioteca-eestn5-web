@@ -7,7 +7,7 @@
 ---
 
 ## 🎯 Objetivo
-Crear una instancia limpia y gratuita de **MySQL 8.0 en la Nube** en [Aiven.io](https://aiven.io) para centralizar la base de datos del proyecto, permitiendo la conexión tanto desde la **Plataforma Web (PHP)** como desde la **App Móvil PWA (Node.js)** y herramientas de administración como **HeidiSQL**.
+Crear una instancia limpia y gratuita de **MySQL 8.0 en la Nube** en [Aiven.io](https://aiven.io) para centralizar la base de datos del proyecto, permitiendo la conexión tanto desde la **Plataforma Web (Node.js + Express)** como desde la **App Móvil PWA (Node.js)** y herramientas de administración como **HeidiSQL**.
 
 ---
 
