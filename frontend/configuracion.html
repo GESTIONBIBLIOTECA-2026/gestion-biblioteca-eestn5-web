@@ -25,7 +25,7 @@
     >
 
     <!-- Iconos Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 </head>
 
 <body>
@@ -70,12 +70,6 @@
                     <i data-lucide="book"></i>
                     <span>Libros</span>
                 </a>
-
-                <a href="reportes.html" class="nav-item" title="Reportes">
-                    <i data-lucide="chart-no-axes-column"></i>
-                    <span>Reportes</span>
-                </a>
-
                 <a href="configuracion.html" class="nav-item activo" aria-current="page" title="Configuración">
                     <i data-lucide="settings"></i>
                     <span>Configuración</span>
@@ -110,6 +104,51 @@
 
                     </div>
 
+                    <!-- CAMPANITA DE ACTIVIDAD (js/notificaciones.js) -->
+                    <div class="menu-notificaciones" data-menu-notificaciones hidden>
+
+                        <button
+                            type="button"
+                            class="boton-notificaciones"
+                            data-abrir-notificaciones
+                            aria-haspopup="dialog"
+                            aria-expanded="false"
+                            aria-controls="panelNotificaciones"
+                            aria-label="Ver actividad reciente"
+                        >
+                            <i data-lucide="bell"></i>
+                            <span class="contador-notificaciones" data-contador-notificaciones hidden>0</span>
+                        </button>
+
+                        <div
+                            class="panel-notificaciones"
+                            id="panelNotificaciones"
+                            role="dialog"
+                            aria-label="Actividad reciente"
+                            hidden
+                        >
+                            <div class="panel-notificaciones-cabecera">
+                                <div>
+                                    <strong>Actividad reciente</strong>
+                                    <span data-notificaciones-resumen>Sin movimientos</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="boton-actualizar-notificaciones"
+                                    data-actualizar-notificaciones
+                                    aria-label="Actualizar actividad"
+                                    title="Actualizar actividad"
+                                >
+                                    <i data-lucide="refresh-cw"></i>
+                                </button>
+                            </div>
+
+                            <ul class="lista-notificaciones" data-lista-notificaciones>
+                                <li class="notificacion-vacia">Cargando actividad...</li>
+                            </ul>
+                        </div>
+
+                    </div>
                     <!-- MENÚ DEL PERFIL (js/menu-perfil.js) -->
                     <div class="menu-perfil" data-menu-perfil>
 
@@ -420,7 +459,7 @@
     <script type="module" src="js/configuracion.js"></script>
 
     <script>
-        window.lucide?.createIcons();
+        document.addEventListener("DOMContentLoaded", () => window.lucide?.createIcons());
     </script>
 
 </body>

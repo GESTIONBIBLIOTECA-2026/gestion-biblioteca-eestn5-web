@@ -34,6 +34,9 @@ const botonGuardar = document.querySelector("#botonGuardar");
 let usuarios = [];
 let libros = [];
 
+// Mismo tope que valida el backend (middlewares/pedidos.middleware.js)
+const CANTIDAD_MAXIMA = 50;
+
 // 🎨 3. Fechas (siempre en horario local, sin corrimientos)
 function hoyISO() {
     const ahora = new Date();
@@ -147,7 +150,7 @@ function filtrarLibros() {
             libroSeleccionado.value = libro.titulo;
             idLibro.value = libro.id_libro;
             stock.value = `${libro.stock} ejemplar${Number(libro.stock) === 1 ? "" : "es"}`;
-            cantidad.max = libro.stock;
+            cantidad.max = Math.min(Number(libro.stock), CANTIDAD_MAXIMA);
             cantidad.value = 1;
             cantidad.setCustomValidity("");
             resultadosLibros.replaceChildren();
@@ -200,7 +203,7 @@ document.addEventListener("click", (evento) => {
 cantidad.addEventListener("input", () => {
     cantidad.setCustomValidity(
         idLibro.value && (Number(cantidad.value) < 1 || Number(cantidad.value) > Number(cantidad.max))
-            ? "Ingresá una cantidad válida según el stock disponible."
+            ? `Ingresá una cantidad entre 1 y ${cantidad.max}.`
             : "");
 });
 
@@ -222,7 +225,7 @@ formulario.addEventListener("submit", async (evento) => {
     }
 
     if (Number(cantidad.value) < 1 || Number(cantidad.value) > Number(cantidad.max)) {
-        mostrarAviso("La cantidad tiene que estar dentro del stock disponible.", true);
+        mostrarAviso(`La cantidad tiene que ser entre 1 y ${cantidad.max}.`, true);
         cantidad.focus();
         return;
     }

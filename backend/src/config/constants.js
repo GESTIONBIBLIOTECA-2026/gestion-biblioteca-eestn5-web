@@ -21,3 +21,6 @@ export const TRANSICIONES_PEDIDO = Object.freeze({
 });
 
 export const PEDIDOS_POR_PAGINA = 200;
+
+// Tope de ejemplares por pedido (evita reservas absurdas y cuida el TINYINT)
+export const CANTIDAD_MAXIMA_PEDIDO = 50;

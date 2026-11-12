@@ -72,6 +72,9 @@ export const guardarMiPerfil = (datos) => pedir("/perfil", "PUT", datos);
 export const cambiarMiClave = (datos) => pedir("/perfil/clave", "PUT", datos);
 export const obtenerMiCuenta = () => pedir("/perfil/historial");   // inicio del alumno / docente
 
+// --- Actividad reciente para la campanita del encabezado (solo administrador) ---
+export const obtenerNotificaciones = (limite = 40) => pedir(`/notificaciones?limite=${limite}`);
+
 // --- Pedidos y préstamos (módulo del Grupo 4 integrado) ---
 export const obtenerResumenPedidos = () => pedir("/pedidos/resumen");
 export const listarPedidos = (filtros = {}) => pedir(`/pedidos?${new URLSearchParams(filtros)}`);

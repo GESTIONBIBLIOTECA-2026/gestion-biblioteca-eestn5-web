@@ -5,7 +5,7 @@
    resto del proyecto) para que el frontend marque el campo.
    ========================================================================== */
 
-import { ESTADOS_PEDIDO, PEDIDOS_POR_PAGINA } from "../config/config.js";
+import { CANTIDAD_MAXIMA_PEDIDO, ESTADOS_PEDIDO, PEDIDOS_POR_PAGINA } from "../config/config.js";
 import { limpiar, rechazar } from "./predicados.js";
 
 // Fecha real en formato YYYY-MM-DD (rechaza 2026-02-31, por ejemplo)
@@ -54,7 +54,11 @@ export const validarNuevoPedido = (req, res, next) => {
 
     if (!datos.id_usuario) campos.id_usuario = "Buscá y seleccioná un usuario.";
     if (!datos.id_libro) campos.id_libro = "Buscá y seleccioná un libro.";
-    if (!datos.cantidad) campos.cantidad = "Ingresá una cantidad válida.";
+    if (!datos.cantidad) {
+        campos.cantidad = "Ingresá una cantidad válida.";
+    } else if (datos.cantidad > CANTIDAD_MAXIMA_PEDIDO) {
+        campos.cantidad = `La cantidad no puede superar los ${CANTIDAD_MAXIMA_PEDIDO} ejemplares.`;
+    }
 
     if (!esFechaISO(datos.fecha_pedido)) {
         campos.fecha_pedido = "Elegí una fecha de pedido válida.";

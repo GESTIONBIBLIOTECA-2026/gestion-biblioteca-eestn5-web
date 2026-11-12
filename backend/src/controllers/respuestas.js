@@ -17,5 +17,5 @@ export const responder409 = (res, campos) => res.status(409).json({ error: Objec
 
 // El Modelo avisó una regla de negocio (404 / 409); cualquier otra cosa es un 500
 export const responderError = (res, error, mensaje) => (error instanceof ErrorNegocio
-    ? res.status(STATUS_NEGOCIO[error.tipo]).json({ error: error.message })
+    ? res.status(STATUS_NEGOCIO[error.tipo] ?? 500).json({ error: error.message })
     : error500(res, error, mensaje));

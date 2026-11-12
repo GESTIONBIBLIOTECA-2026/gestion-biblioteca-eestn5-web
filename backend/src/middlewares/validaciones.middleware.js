@@ -55,6 +55,17 @@ export const validarLimite = (req, res, next) => {
     next();
 };
 
+/* --- ?limite= de la campanita de notificaciones (1 a 100, por defecto 40) --- */
+export const validarLimiteNotificaciones = (req, res, next) => {
+    req.limite = Number(req.query.limite ?? 40);
+
+    if (!Number.isInteger(req.limite) || req.limite < 1 || req.limite > 100) {
+        return res.status(400).json({ error: "El límite tiene que ser un número entre 1 y 100." });
+    }
+
+    next();
+};
+
 /* --- Búsqueda: ?nombre=&dni=&curso=&filtro=&pagina= --- */
 export const validarBusqueda = (req, res, next) => {
     const { nombre, dni, curso, filtro = "todos", pagina = 1 } = req.query;

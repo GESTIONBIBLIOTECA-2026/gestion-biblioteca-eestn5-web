@@ -3,7 +3,7 @@
    Solo consulta la base con comodines "?" y devuelve datos puros.
    ========================================================================== */
 
-import connection from "../database/db.js";
+import connection, { conTransaccion } from "../database/db.js";
 import { CONDICION, COLUMNAS, DESDE } from "./usuario.sql.js";
 
 
@@ -43,28 +43,36 @@ export const buscarRepetidos = async (dni, correo, idPropio = 0) => {
 };
 
 // ID del curso por nombre. Si no existe, lo crea (INSERT IGNORE no falla si ya está).
-const getIdCurso = async (nombre) => {
+// Recibe la conexión de la transacción para que el alta del curso se guarde junto con el usuario.
+const getIdCurso = async (conexion, nombre) => {
     if (!nombre) return null;
-    await connection.query("INSERT IGNORE INTO cursos (nombre) VALUES (?)", [nombre]);
-    const [rows] = await connection.query("SELECT id FROM cursos WHERE nombre = ?", [nombre]);
+    await conexion.query("INSERT IGNORE INTO cursos (nombre) VALUES (?)", [nombre]);
+    const [rows] = await conexion.query("SELECT id FROM cursos WHERE nombre = ?", [nombre]);
     return rows[0].id;
 };
 
-export const crearUsuario = async ({ dni, nombre_completo, rol, curso, correo, telefono, direccion, password_hash }) => {
+export const crearUsuario = (datos) => conTransaccion(async (conexion) => {
+    const { dni, nombre_completo, rol, curso, correo, telefono, direccion, password_hash } = datos;
     const sql = `INSERT INTO usuarios (dni, nombre_completo, curso_id, correo, telefono, direccion, password_hash, rol_id)
                  VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT id FROM roles WHERE nombre = ?))`;
-    const [resultado] = await connection.query(sql,
-        [dni, nombre_completo, await getIdCurso(curso), correo, telefono, direccion, password_hash, rol]);
+    const [resultado] = await conexion.query(sql,
+        [dni, nombre_completo, await getIdCurso(conexion, curso), correo, telefono, direccion, password_hash, rol]);
     return resultado.insertId;
-};
+});
 
-// La contraseña solo cambia si viene password_hash (COALESCE deja la que estaba)
-export const actualizarUsuario = async (id, { dni, nombre_completo, rol, curso, correo, telefono, direccion, password_hash }) => {
+// La contraseña solo cambia si viene password_hash (COALESCE deja la que estaba).
+// Primero se comprueba que el usuario exista: MySQL informa 0 filas cuando el
+// UPDATE no cambia ningún valor, y eso NO significa que el ID no exista.
+export const actualizarUsuario = (id, datos) => conTransaccion(async (conexion) => {
+    const [filas] = await conexion.query("SELECT id FROM usuarios WHERE id = ? FOR UPDATE", [id]);
+    if (!filas[0]) return 0;
+
+    const { dni, nombre_completo, rol, curso, correo, telefono, direccion, password_hash } = datos;
     const sql = `UPDATE usuarios SET dni = ?, nombre_completo = ?, curso_id = ?, correo = ?, telefono = ?, direccion = ?,
                  rol_id = (SELECT id FROM roles WHERE nombre = ?), password_hash = COALESCE(?, password_hash)
                  WHERE id = ?`;
-    const [resultado] = await connection.query(sql,
-        [dni, nombre_completo, await getIdCurso(curso), correo, telefono, direccion, rol, password_hash, id]);
-    return resultado.affectedRows;
-};
+    await conexion.query(sql,
+        [dni, nombre_completo, await getIdCurso(conexion, curso), correo, telefono, direccion, rol, password_hash, id]);
+    return 1;
+});
 

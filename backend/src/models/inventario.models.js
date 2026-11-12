@@ -26,10 +26,15 @@ const guardarDatos = async (conexion, id, { titulo, autores, editorial, isbn, po
     const datos = [isbn, titulo, categoria_id, editorialId, anio, portada_url];
 
     if (id) {
-        const [r] = await conexion.query(
-            "UPDATE libros SET isbn = ?, titulo = ?, categoria_id = ?, editorial_id = ?, anio_publicacion = ?, portada_url = ? WHERE id = ? AND activo = TRUE",
+        // Se comprueba la existencia antes del UPDATE: si los datos no cambian,
+        // MySQL devuelve affectedRows = 0 y no es un 404.
+        const [existente] = await conexion.query(
+            "SELECT id FROM libros WHERE id = ? AND activo = TRUE FOR UPDATE", [id]);
+        if (!existente[0]) throw noExiste("No hay ningún libro activo con ese ID.");
+
+        await conexion.query(
+            "UPDATE libros SET isbn = ?, titulo = ?, categoria_id = ?, editorial_id = ?, anio_publicacion = ?, portada_url = ? WHERE id = ?",
             [...datos, id]);
-        if (r.affectedRows === 0) throw noExiste("No hay ningún libro activo con ese ID.");
         await conexion.query("DELETE FROM libros_autores WHERE libro_id = ?", [id]);
     } else {
         const [r] = await conexion.query(

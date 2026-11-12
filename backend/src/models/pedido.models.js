@@ -12,6 +12,7 @@
 import connection, { conTransaccion } from "../database/db.js";
 import { TRANSICIONES_PEDIDO } from "../config/config.js";
 import { noExiste, conflicto } from "./errores.models.js";
+import { CONDICION } from "./usuario.sql.js";
 
 // Columnas que devuelve el panel. `estado` se calcula: un préstamo cuya
 // fecha estimada ya pasó se muestra como "vencido" sin esperar un proceso.
@@ -92,14 +93,16 @@ export const obtenerResumenPedidos = async () => {
     return rows[0];
 };
 
-/* --- Usuarios habilitados para el buscador del formulario --- */
+/* --- Usuarios habilitados para el buscador del formulario ---
+   Se usa la misma CONDICION que ve el bibliotecario: no alcanza con
+   usuarios.estado, porque un moroso sigue "habilitado" en esa columna. */
 export const listarUsuariosHabilitados = async () => {
     const sql = `SELECT u.id AS id_usuario, u.id, u.nombre_completo AS nombre, u.dni,
-                        c.nombre AS curso, r.nombre AS rol
+                        c.nombre AS curso, r.nombre AS rol, ${CONDICION} AS condicion
                  FROM usuarios u
                  JOIN roles r ON r.id = u.rol_id
                  LEFT JOIN cursos c ON c.id = u.curso_id
-                 WHERE u.estado = 'habilitado'
+                 WHERE ${CONDICION} = 'habilitado'
                  ORDER BY u.nombre_completo`;
     const [rows] = await connection.query(sql);
     return rows;
@@ -124,11 +127,19 @@ export const listarLibrosDisponibles = async () => {
    simultáneas no reserven el mismo último ejemplar. */
 export const crearPedido = (datos, registradoPor) => conTransaccion(async (conexion) => {
     const [usuarios] = await conexion.query(
-        "SELECT id, nombre_completo, estado FROM usuarios WHERE id = ? FOR UPDATE",
+        `SELECT u.id, u.nombre_completo, ${CONDICION} AS condicion
+         FROM usuarios u WHERE u.id = ? FOR UPDATE`,
         [datos.id_usuario]);
     if (!usuarios[0]) throw noExiste("El usuario no existe.");
-    if (usuarios[0].estado !== "habilitado") {
-        throw conflicto("El usuario no está habilitado para realizar pedidos.");
+
+    // La condición incluye sanciones activas y préstamos vencidos
+    const motivos = {
+        atraso: "El usuario tiene préstamos vencidos sin devolver.",
+        suspendido: "El usuario está suspendido.",
+        baja: "El usuario está dado de baja."
+    };
+    if (usuarios[0].condicion !== "habilitado") {
+        throw conflicto(motivos[usuarios[0].condicion] ?? "El usuario no está habilitado para realizar pedidos.");
     }
 
     const [libros] = await conexion.query(

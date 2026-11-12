@@ -28,6 +28,7 @@ localhost:3001                     backend/ (puerto 3001)                  src/d
 │   ├── catalogo.html, inicio-usuario.html                                       (alumnos y docentes)
 │   ├── css/                      estilo-general.css, componentes.css, prestamos.css, ...
 │   └── js/                       config.js (URL de la API), api.js (fetch), ...
+│                                 sesion.js (sesión + campanita), notificaciones.js,
 │                                 prestamos.js, pedidos.js, historial.js, crear-pedido.js, pedidos-ui.js
 │
 └── backend/                      MVC: index.js ➔ Router ➔ Controller ➔ Model ➔ MySQL
@@ -41,12 +42,14 @@ localhost:3001                     backend/ (puerto 3001)                  src/d
     │   │   ├── usuario.sql.js     pedazos de SQL compartidos (atraso, condición, columnas)
     │   │   ├── libro.models.js (catálogo), inventario.models.js (alta, cambios, stock, baja), ejemplar.models.js
     │   │   ├── errores.models.js  ErrorNegocio: el Modelo dice QUÉ pasó, el Controlador elige el código HTTP
-    │   │   └── dashboard.models.js, curso.models.js, prestamo.models.js, pedido.models.js
+    │   │   ├── dashboard.models.js, curso.models.js, prestamo.models.js, pedido.models.js
+    │   │   └── notificacion.models.js  actividad reciente para la campanita (UNION de tablas reales)
     │   ├── controllers/          CONTROLLER: reglas de negocio y respuesta HTTP
     │   │   ├── auth, perfil, usuarios, sanciones, dashboard, cursos, prestamos, libros, pedidos
+    │   │   ├── notificaciones.controllers.js
     │   │   └── respuestas.js      error500, responder409 y responderError (ErrorNegocio → 404 / 409)
     │   ├── routes/               ROUTER: URL + verbo HTTP → middlewares → controlador
-    │   │   └── auth, perfil, dashboard, usuarios, cursos, prestamos, libros, pedidos
+    │   │   └── auth, perfil, dashboard, usuarios, cursos, prestamos, libros, pedidos, notificaciones
     │   └── middlewares/          auth (token), validaciones (URL), formularios (body), predicados,
     │                             libros, pedidos, límite de intentos
     └── scripts/                  schema.sql, datos-prueba-grupo5.sql, inicializar-bd.js,
@@ -81,6 +84,7 @@ Las URLs, los JSON de respuesta y los códigos HTTP del panel original se mantuv
 | `GET` | `/api/perfil/historial` | Mi cuenta (alumno/docente): datos, préstamos con `dias_restantes`, reservas y sanciones |
 | `GET` | `/api/dashboard` | `{ payload: { libros_total, prestamos_activos, alumnos_morosos } }` |
 | `GET` | `/api/prestamos?limite=5` | Últimos préstamos (en curso, atrasados y devueltos) |
+| `GET` | `/api/notificaciones?limite=40` | Actividad reciente de la campanita: altas, pedidos, entregas, devoluciones, cancelaciones y sanciones (admin) |
 | **Grupo 4 (módulo de pedidos integrado)** | | |
 | `GET` | `/api/pedidos?estado=&texto=&limite=` | Listado de pedidos con filtros. `estado`: `pendiente`, `prestado`, `vencido`, `devuelto`, `cancelado` o `todos` |
 | `GET` | `/api/pedidos/resumen` | `{ total, pendientes, prestados, atrasados, devueltos, cancelados }` para el panel |
@@ -126,6 +130,15 @@ Flujo de estados: la reserva nace **pendiente**; “Entregar” la pasa a **pres
 (asigna ejemplares físicos); “Registrar devolución” la pasa a **devuelto** (los ejemplares vuelven
 al estante); “Rechazar” la deja **cancelado**. El estado **vencido** no se guarda: se calcula al
 listar cuando la fecha estimada ya pasó y el préstamo sigue en curso.
+
+### Campanita de actividad (reemplaza a Reportes)
+
+La campanita del encabezado (`frontend/js/notificaciones.js`) muestra la actividad reciente del
+panel: usuarios registrados, pedidos/reservas, préstamos entregados, devoluciones, cancelaciones
+y sanciones. Se arma en el backend con las tablas reales (`usuarios`, `pedidos`,
+`pedido_historial`, `sanciones`) mediante `GET /api/notificaciones`; no duplica datos ni requiere
+una tabla nueva. Solo la ve el administrador y el estado leído/no leído se guarda en el
+`localStorage` del navegador.
 
 ---
 
@@ -204,6 +217,11 @@ Vas a ver:
 ```
 
 Abrí **<http://localhost:3001>** y entrá con el DNI y la contraseña del administrador.
+
+La dirección de la API (`frontend/js/config.js`) usa el **mismo origen** cuando el frontend lo
+sirve este backend. Por eso también funciona desde un celular u otra PC de la LAN entrando a
+`http://IP-DE-LA-PC:3001`. Si abrís el frontend con Live Server (por ejemplo `:5500`), sigue
+apuntando a `http://localhost:3001/api`.
 
 > `npm run dev` usa **nodemon**: si cambiás un archivo del backend, el servidor se reinicia solo.
 > Para correrlo sin reinicio automático: `npm.cmd start`.

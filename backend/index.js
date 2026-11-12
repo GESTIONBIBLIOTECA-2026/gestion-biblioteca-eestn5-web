@@ -7,6 +7,7 @@
 // 1. Frameworks, configuración y rutas (config.js frena todo si falta algo en el .env)
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import { fileURLToPath } from "url";
 import { PORT } from "./src/config/config.js";
 import connection from "./src/database/db.js";
@@ -18,15 +19,25 @@ import cursosRoutes from "./src/routes/cursos.routes.js";
 import prestamosRoutes from "./src/routes/prestamos.routes.js";
 import pedidosRoutes from "./src/routes/pedidos.routes.js";
 import librosRoutes from "./src/routes/libros.routes.js";
+import notificacionesRoutes from "./src/routes/notificaciones.routes.js";
 
 // 2. Aplicación y middlewares globales
 const app = express();
 const carpetaFrontend = fileURLToPath(new URL("../frontend", import.meta.url));
 
 app.disable("x-powered-by");
+app.use(compression());                     // respuestas JSON y archivos comprimidos (gzip)
 app.use(cors());
 app.use(express.json());
-app.use(express.static(carpetaFrontend));   // el panel se abre en http://localhost:3001
+
+// El panel se abre en http://localhost:3001. HTML sin caché (para ver los cambios)
+// y CSS/JS con caché corta: al navegar entre páginas no se vuelven a bajar.
+app.use(express.static(carpetaFrontend, {
+    maxAge: "1h",
+    setHeaders: (res, ruta) => {
+        if (ruta.endsWith(".html")) res.setHeader("Cache-Control", "no-cache");
+    }
+}));
 
 // 3. Rutas de la API
 app.use("/api/auth", authRoutes);
@@ -37,6 +48,7 @@ app.use("/api/cursos", cursosRoutes);
 app.use("/api/prestamos", prestamosRoutes);
 app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/libros", librosRoutes);
+app.use("/api/notificaciones", notificacionesRoutes);
 
 // 4. Ruta de la API que no existe → 404
 app.use("/api", (req, res) => res.status(404).json({ error: "Ruta no encontrada" }));

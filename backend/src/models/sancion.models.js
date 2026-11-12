@@ -3,7 +3,7 @@
    Suspender (sanción), habilitar y dar de baja.
    ========================================================================== */
 
-import connection from "../database/db.js";
+import connection, { conTransaccion } from "../database/db.js";
 
 // Historial activo: préstamos (la vista calcula los días de atraso) y sanciones.
 // dias_restantes: cuántos días faltan para la fecha de devolución (negativo = ya pasó)
@@ -27,44 +27,51 @@ export const getHistorial = async (id) => {
     return { prestamos, sanciones };
 };
 
-// Suspender: guarda la sanción (asociada al préstamo atrasado si tiene uno) y marca al usuario
-export const suspenderUsuario = async (id, motivo, adminId) => {
-    const [atrasados] = await connection.query(
+// Suspender: guarda la sanción (asociada al préstamo atrasado si tiene uno) y marca al usuario.
+// Las dos escrituras van juntas: si falla una, no queda la sanción sin el estado (o al revés).
+export const suspenderUsuario = (id, motivo, adminId) => conTransaccion(async (conexion) => {
+    const [atrasados] = await conexion.query(
         `SELECT id FROM pedidos WHERE usuario_id = ?
          AND (estado = 'vencido' OR (estado = 'prestado' AND fecha_devolucion_estimada < CURRENT_DATE)) LIMIT 1`,
         [id]
     );
     const pedidoId = atrasados[0]?.id ?? null;
 
-    await connection.query(
+    await conexion.query(
         `INSERT INTO sanciones (usuario_id, pedido_id, tipo, motivo, fecha_inicio, activa, aplicada_por)
          VALUES (?, ?, ?, ?, CURRENT_DATE, TRUE, ?)`,
         [id, pedidoId, pedidoId ? "atraso" : "manual", motivo, adminId]
     );
-    await connection.query("UPDATE usuarios SET estado = 'suspendido' WHERE id = ?", [id]);
-};
+    await conexion.query("UPDATE usuarios SET estado = 'suspendido' WHERE id = ?", [id]);
+});
 
 // Habilitar (o reactivar una baja): las sanciones no se borran, se cierran con fecha de hoy
-export const habilitarUsuario = async (id) => {
-    await connection.query(
+export const habilitarUsuario = (id) => conTransaccion(async (conexion) => {
+    await conexion.query(
         `UPDATE sanciones SET activa = FALSE, fecha_fin = LEAST(COALESCE(fecha_fin, CURRENT_DATE), CURRENT_DATE)
          WHERE usuario_id = ? AND activa = TRUE`,
         [id]
     );
-    await connection.query("UPDATE usuarios SET estado = 'habilitado' WHERE id = ?", [id]);
-};
+    await conexion.query("UPDATE usuarios SET estado = 'habilitado' WHERE id = ?", [id]);
+});
 
 // Baja lógica: no se borra (queda el historial) y sus reservas pendientes se cancelan
-export const darDeBajaUsuario = async (id, adminId) => {
-    await connection.query(
+export const darDeBajaUsuario = (id, adminId) => conTransaccion(async (conexion) => {
+    await conexion.query(
         `INSERT INTO pedido_historial (pedido_id, estado_anterior, estado_nuevo, registrado_por, observacion)
          SELECT id, 'pendiente', 'cancelado', ?, 'Reserva cancelada por la baja del usuario'
          FROM pedidos WHERE usuario_id = ? AND estado = 'pendiente'`,
         [adminId, id]
     );
-    const [resultado] = await connection.query(
+    const [resultado] = await conexion.query(
         "UPDATE pedidos SET estado = 'cancelado' WHERE usuario_id = ? AND estado = 'pendiente'", [id]
     );
-    await connection.query("UPDATE usuarios SET estado = 'baja' WHERE id = ?", [id]);
+    await conexion.query(
+        `UPDATE sanciones SET activa = FALSE,
+                fecha_fin = LEAST(COALESCE(fecha_fin, CURRENT_DATE), CURRENT_DATE)
+         WHERE usuario_id = ? AND activa = TRUE`,
+        [id]
+    );
+    await conexion.query("UPDATE usuarios SET estado = 'baja' WHERE id = ?", [id]);
     return resultado.affectedRows;   // reservas canceladas
-};
+});

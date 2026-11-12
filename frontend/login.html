@@ -26,7 +26,7 @@
     >
 
     <!-- Iconos Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 
 </head>
 
@@ -217,9 +217,9 @@
      SCRIPTS
 ====================================================== -->
 
-<script>
-    lucide.createIcons();
-</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => window.lucide?.createIcons());
+    </script>
 
 <!-- Lógica del login (ES Module) -->
 <script type="module" src="js/login.js"></script>
